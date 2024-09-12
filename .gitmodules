@@ -1,0 +1,3 @@
+[submodule "external/forked-repo"]
+	path = external/forked-repo
+	url = https://github.com/thanhttran21/wiz
