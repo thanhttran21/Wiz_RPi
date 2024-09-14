@@ -1,6 +1,6 @@
 import time
 import RPi.GPIO as GPIO
-from src.gpio_setup import BUTTON_PIN
+from gpio_setup import BUTTON_PIN
 
 def check_button_press(state, last_button_state, last_press_time):
     button_state = GPIO.input(BUTTON_PIN)
