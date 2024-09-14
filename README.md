@@ -1,9 +1,13 @@
 # Getting Started
+Accessing ASUS home router:
+Username: admin
+Password: asuswifi22!
+
 To ssh into the RPi, open up Terminal and enter:
 ```
 ssh thanhtran@raspberrypi.local
 ```
-Password: same as Macbook password
+Password: apt1
 
 ## Resources
 

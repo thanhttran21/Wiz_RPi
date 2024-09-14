@@ -23,4 +23,4 @@ while True:
     light.on()
     light.scene(4)
     time.sleep(2)
-    print("Done")
+    
