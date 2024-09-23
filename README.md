@@ -6,6 +6,7 @@ Password: asuswifi22!
 To ssh into the RPi, open up Terminal and enter:
 ```
 ssh thanhtran@raspberrypi.local
+ssh thanhtran@192.168.1.3
 ```
 Password: apt1
 
