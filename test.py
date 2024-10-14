@@ -7,20 +7,35 @@
     3. See if light turns on again from script
     4. Try with other commands
 """
+# import time
+# from wiz_api.wiz import Light
+
+# IP = '192.168.1.10'  # replace with your Wiz's IP address
+
+# print("Testing...")
+
+# light = Light(IP)
+# while True:
+    # print("Off")
+    # light.off()
+    # time.sleep(2)
+    # print("On")
+    # light.on()
+    # light.scene(4)
+    # time.sleep(2)
+    
+import RPi.GPIO as GPIO
 import time
-from wiz_api.wiz import Light
 
-IP = '192.168.1.10'  # replace with your Wiz's IP address
+GPIO.setmode(GPIO.BCM)
 
-print("Testing...")
+led = 4
+sw = 5
 
-light = Light(IP)
+GPIO.setup(led, GPIO.OUT)
+GPIO.setup(sw, GPIO.IN)
+
 while True:
-    print("Off")
-    light.off()
-    time.sleep(2)
-    print("On")
-    light.on()
-    light.scene(4)
-    time.sleep(2)
+    GPIO.output(led, GPIO.input(sw))
+    time.sleep(0.2)
     
