@@ -21,20 +21,21 @@ def main():
             # print(pot_intensity)
 
             # Handle button press and update state
-            # state, last_button_state, last_press_time = check_button_press(state, last_button_state, last_press_time)
+            state, last_button_state, last_press_time = check_button_press(state, last_button_state, last_press_time)
 
 
             # Check switch states
-            # switch_even_state = GPIO.input(SWITCH_EVEN_PIN)
+            switch_even_state = GPIO.input(SWITCH_EVEN_PIN)
             switch_odd_state = GPIO.input(SWITCH_ODD_PIN)
 
             state = 0
-            switch_even_state = 0
 
-            print(switch_odd_state)
+            print(f'State: {state}')
+            print(f'Switch even state: {switch_even_state}')
+            print(f'Switch odd state: {switch_odd_state}')
 
             # Control lights based on switch states and current state. TODO: Add potentiometer control for light intensity
-            # control_lights(state, switch_even_state, switch_odd_state)
+            control_lights(state, switch_even_state, switch_odd_state)
 
             time.sleep(0.2)
 
