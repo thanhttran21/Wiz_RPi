@@ -24,14 +24,19 @@ LIGHTS_ODD = [wizlight(BULB_1_IP), wizlight(BULB_3_IP)]
 async def control_lights(scene, switch_even_state, switch_odd_state):
     tasks = []
     if switch_even_state:
-        tasks += [bulb.turn_on(PilotBuilder(scene=SCENES[scene])) for bulb in LIGHTS_EVEN]
+        for bulb in LIGHTS_EVEN:
+            tasks.append(bulb.turn_on(PilotBuilder(scene=SCENES[scene])))
     else:
-        tasks += [bulb.turn_off() for bulb in LIGHTS_EVEN]
+        for bulb in LIGHTS_EVEN:
+            tasks.append(bulb.turn_off())
 
     if switch_odd_state:
-        tasks += [bulb.turn_on(PilotBuilder(scene=SCENES[scene])) for bulb in LIGHTS_ODD]
+        for bulb in LIGHTS_ODD:
+            tasks.append(bulb.turn_on(PilotBuilder(scene=SCENES[scene])))
     else:
-        tasks += [bulb.turn_off() for bulb in LIGHTS_ODD]
+        for bulb in LIGHTS_ODD:
+            tasks.append(bulb.turn_off())
 
     # Run all turn_on coroutines concurrently
-    await asyncio.gather(*tasks)
+    if tasks:
+        await asyncio.gather(*tasks)

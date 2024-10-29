@@ -40,7 +40,8 @@ async def main():
         # Control lights based on current scene and switch states. TODO: Add potentiometer control for light intensity
         await control_lights(scene, switch_even_state, switch_odd_state)
 
-        time.sleep(0.2)
+        await asyncio.sleep(0.2)
 
-# Run the main function
-asyncio.run(main())
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
