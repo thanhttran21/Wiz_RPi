@@ -28,7 +28,7 @@ async def main():
     # Turn the light on into "rhythm mode"
     await light.turn_on(PilotBuilder())
     # Set bulb brightness
-    await light.turn_on(PilotBuilder(brightness = 255/2))
+    await light.turn_on(PilotBuilder(brightness = 255))
 
     # Set bulb brightness (with async timeout)
     # timeout = 10
