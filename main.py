@@ -1,48 +1,46 @@
+import asyncio
 import time
 import RPi.GPIO as GPIO
+from pywizlight import wizlight, PilotBuilder, discovery
 from gpio_setup import setup_gpio, SWITCH_EVEN_PIN, SWITCH_ODD_PIN
 from button_handler import check_button_press
 from light_controller import control_lights
 from potentiometer import analog_read
 
-def main():
+async def main():
     setup_gpio()
 
-    state = 0
+    scene = 0
     last_button_state = GPIO.HIGH
     last_press_time = time.time()
+    
+    # Discover all bulbs in the network via broadcast datagram (UDP)
+    bulbs = await discovery.discover_lights(broadcast_space="192.168.1.255")
+    
+    # Check if any bulbs are found
+    if bulbs:
+        # Iterate over all returned bulbs
+        for bulb in bulbs:
+            print(bulb.__dict__)
+            # Uncomment if you want to turn off all bulbs
+            # await bulb.turn_off()
 
-    try:
-        print('Start...')
+    while True:
+        # Handle button press and update state
+        scene, last_button_state, last_press_time = check_button_press(scene, last_button_state, last_press_time)
 
-        while True:
-            # Print potentiometer value. TODO: Add potentiometer control for light intensity
-            # pot_intensity = analog_read()
-            # print(pot_intensity)
+        # Check switch states
+        switch_even_state = GPIO.input(SWITCH_EVEN_PIN)
+        switch_odd_state = GPIO.input(SWITCH_ODD_PIN)
 
-            # Handle button press and update state
-            state, last_button_state, last_press_time = check_button_press(state, last_button_state, last_press_time)
+        print(f'Scene: {scene}')
+        print(f'Switch even state: {switch_even_state}')
+        print(f'Switch odd state: {switch_odd_state}')
 
+        # Control lights based on current scene and switch states. TODO: Add potentiometer control for light intensity
+        await control_lights(scene, switch_even_state, switch_odd_state)
 
-            # Check switch states
-            switch_even_state = GPIO.input(SWITCH_EVEN_PIN)
-            switch_odd_state = GPIO.input(SWITCH_ODD_PIN)
+        time.sleep(0.2)
 
-            state = 0
-
-            print(f'State: {state}')
-            print(f'Switch even state: {switch_even_state}')
-            print(f'Switch odd state: {switch_odd_state}')
-
-            # Control lights based on switch states and current state. TODO: Add potentiometer control for light intensity
-            control_lights(state, switch_even_state, switch_odd_state)
-
-            time.sleep(0.2)
-
-    except KeyboardInterrupt:
-        print('Finish...')
-    finally:
-        GPIO.cleanup()
-
-if __name__ == "__main__":
-    main()
+# Run the main function
+asyncio.run(main())
