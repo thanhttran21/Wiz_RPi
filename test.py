@@ -42,7 +42,7 @@ async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
         if switch_even.is_active:  # Replace with actual logic
             print("Even switch activated")
             for bulb in even_bulbs:
-                await bulb.turn_on(PilotBuilder())
+                await bulb.turn_on(PilotBuilder(warm_white=255))
         else:
             for bulb in even_bulbs:
                 await bulb.turn_off()
@@ -50,7 +50,7 @@ async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
         if switch_odd.is_active:  # Replace with actual logic
             print("Odd switch activated")
             for bulb in odd_bulbs:
-                await bulb.turn_on(PilotBuilder())
+                await bulb.turn_on(PilotBuilder(warm_white=255))
         else:
             for bulb in odd_bulbs:
                 await bulb.turn_off()
