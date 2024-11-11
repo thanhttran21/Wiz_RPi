@@ -21,14 +21,16 @@ BULB_3_IP = '192.168.1.13'
 
 # Initialize WiZ lights
 bulb_0 = wizlight(BULB_0_IP)
-bulb_1 = wizlight(BULB_1_IP)
-bulb_2 = wizlight(BULB_2_IP)
-bulb_3 = wizlight(BULB_3_IP)
+# bulb_1 = wizlight(BULB_1_IP)
+# bulb_2 = wizlight(BULB_2_IP)
+# bulb_3 = wizlight(BULB_3_IP)
 
 # List of bulbs for even and odd switches
-even_bulbs = [bulb_0, bulb_2]
-odd_bulbs = [bulb_1, bulb_3]
+# even_bulbs = [bulb_0, bulb_2]
+# odd_bulbs = [bulb_1, bulb_3]
 
+even_bulbs = [bulb_0]
+odd_bulbs = []
 # Scenes for WiZ lights. Matches bit encoded button state to corresponding scene number
 SCENES = {
     0: 11,  # Warm white
@@ -39,19 +41,21 @@ SCENES = {
 
 async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
     while True:
-        if switch_even.is_active:  # Replace with actual logic
+        if switch_even.when_activated:  # Replace with actual logic
             print("Even switch activated")
             for bulb in even_bulbs:
                 await bulb.turn_on(PilotBuilder(warm_white=255))
-        else:
+        if switch_even.when_deactivated:
+            print("Even switch deactivated")
             for bulb in even_bulbs:
                 await bulb.turn_off()
 
-        if switch_odd.is_active:  # Replace with actual logic
+        if switch_odd.when_activated:  # Replace with actual logic
             print("Odd switch activated")
             for bulb in odd_bulbs:
                 await bulb.turn_on(PilotBuilder(warm_white=255))
-        else:
+        if switch_even.when_deactivated:
+            print("Odd switch deactivated")
             for bulb in odd_bulbs:
                 await bulb.turn_off()
 

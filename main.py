@@ -7,6 +7,10 @@ from button_handler import check_button_press
 from light_controller import control_lights
 from potentiometer import analog_read
 
+async def read_gpio_input(pin):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, GPIO.input, pin)
+
 async def main():
     setup_gpio()
 
@@ -27,15 +31,19 @@ async def main():
 
     while True:
         # Handle button press and update state
-        scene, last_button_state, last_press_time = check_button_press(scene, last_button_state, last_press_time)
+        # scene, last_button_state, last_press_time = check_button_press(scene, last_button_state, last_press_time)
 
         # Check switch states
-        switch_even_state = GPIO.input(SWITCH_EVEN_PIN)
-        switch_odd_state = GPIO.input(SWITCH_ODD_PIN)
+        print("before")
+        switch_even_state = await read_gpio_input(SWITCH_EVEN_PIN)
+        switch_odd_state = await read_gpio_input(SWITCH_ODD_PIN)
+        print("after")
 
         print(f'Scene: {scene}')
         print(f'Switch even state: {switch_even_state}')
         print(f'Switch odd state: {switch_odd_state}')
+
+        scene = 0
 
         # Control lights based on current scene and switch states. TODO: Add potentiometer control for light intensity
         await control_lights(scene, switch_even_state, switch_odd_state)
