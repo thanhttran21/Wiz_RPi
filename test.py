@@ -71,19 +71,22 @@ def setup_switch_callbacks(loop):
 async def handle_button_presses(button, leds, bulbs):
     scene = 0  # Initial scene
     while True:
-        await button.wait_for_press()
-        print("Button pressed")
+        if button.is_pressed:
+            print("Button pressed")
 
-        # Change LED state based on the button press
-        scene = (scene + 1) % 4  # Cycle through scenes 0-3
-        leds[0].value = scene & 1  # Binary state for LED 1
-        leds[1].value = (scene >> 1) & 1  # Binary state for LED 2
+            # Change LED state based on the button press
+            scene = (scene + 1) % 4  # Cycle through scenes 0-3
+            leds[0].value = scene & 1  # Binary state for LED 1
+            leds[1].value = (scene >> 1) & 1  # Binary state for LED 2
 
-        # Change scene on bulbs
-        for bulb in bulbs:
-            await bulb.turn_on(PilotBuilder(scene=SCENES[scene]))
+            # Change scene on bulbs
+            for bulb in bulbs:
+                await bulb.turn_on(PilotBuilder(scene=SCENES[scene]))
 
-        await asyncio.sleep(0.1)  # Debounce delay
+            await asyncio.sleep(0.1)  # Debounce delay
+
+        await asyncio.sleep(0.1)  # Non-blocking polling interval for button state
+
 
 # Main coroutine to discover lights and run tasks concurrently
 async def main():
