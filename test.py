@@ -39,7 +39,8 @@ SCENES = {
     3: 4    # Party
 }
 
-async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
+async def main():
+    scene = 0  # Initial scene
     while True:
         # Handle even switch
         if switch_even.is_pressed:
@@ -61,12 +62,7 @@ async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
             for bulb in odd_bulbs:
                 await bulb.turn_off()
 
-        await asyncio.sleep(0.1)  # Non-blocking polling interval for switches
-
-
-async def handle_button_presses(button, leds, bulbs):
-    scene = 0  # Initial scene
-    while True:
+        # Handle button press
         if button.is_pressed:
             print("Button pressed")
 
@@ -76,27 +72,12 @@ async def handle_button_presses(button, leds, bulbs):
             leds[1].value = (scene >> 1) & 1  # Binary state for LED 2
 
             # Change scene on bulbs
-            for bulb in bulbs:
+            for bulb in even_bulbs + odd_bulbs:
                 await bulb.turn_on(PilotBuilder(scene=SCENES[scene]))
 
             await asyncio.sleep(0.1)  # Debounce delay
 
-        await asyncio.sleep(0.1)  # Non-blocking polling interval for button state
-
-
-# Main coroutine to discover lights and run tasks concurrently
-async def main():
-    # Discover WiZ lights on the network
-    bulbs = await discovery.discover_lights(broadcast_space="192.168.1.255")
-    if bulbs:
-        for bulb in bulbs:
-            print("Discovered bulb:", bulb.__dict__)
-
-    # Run switch monitoring and LED toggling tasks concurrently
-    await asyncio.gather(
-        monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs),
-        handle_button_presses(button, leds, even_bulbs + odd_bulbs)
-    )
+        await asyncio.sleep(0.1)  # Non-blocking polling interval for switch and button state
 
 # Run the asyncio event loop
 asyncio.run(main())
