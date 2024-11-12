@@ -62,10 +62,11 @@ async def turn_off_odd_bulbs():
 
 # Attach async functions to switch events
 def setup_switch_callbacks(loop):
-    switch_even.when_pressed = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_on_even_bulbs()))
-    switch_even.when_released = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_off_even_bulbs()))
-    switch_odd.when_pressed = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_on_odd_bulbs()))
-    switch_odd.when_released = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_off_odd_bulbs()))
+    switch_even.when_pressed = lambda: asyncio.run_coroutine_threadsafe(turn_on_even_bulbs(), loop)
+    switch_even.when_released = lambda: asyncio.run_coroutine_threadsafe(turn_off_even_bulbs(), loop)
+    switch_odd.when_pressed = lambda: asyncio.run_coroutine_threadsafe(turn_on_odd_bulbs(), loop)
+    switch_odd.when_released = lambda: asyncio.run_coroutine_threadsafe(turn_off_odd_bulbs(), loop)
+
 
 async def handle_button_presses(button, leds, bulbs):
     scene = 0  # Initial scene
