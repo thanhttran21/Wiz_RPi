@@ -39,42 +39,52 @@ SCENES = {
     3: 4    # Party
 }
 
+async def toggle_bulbs(bulbs, turn_on, scene=None):
+    """Turn on or off bulbs with optional scene setting."""
+    tasks = []
+    for bulb in bulbs:
+        if turn_on:
+            if scene is not None:
+                task = bulb.turn_on(PilotBuilder(scene=scene))
+            else:
+                task = bulb.turn_on(PilotBuilder(warm_white=255))
+        else:
+            task = bulb.turn_off()
+        tasks.append(asyncio.create_task(task))
+    await asyncio.gather(*tasks)
+
 async def main():
+    # Discover WiZ lights on the network
+    bulbs = await discovery.discover_lights(broadcast_space="192.168.1.255")
+    if bulbs:
+        for bulb in bulbs:
+            print("Discovered bulb:", bulb.__dict__)
+
     scene = 0  # Initial scene
     while True:
         # Handle even switch
         if switch_even.is_pressed:
             print("Even switch activated")
-            for bulb in even_bulbs:
-                await bulb.turn_on(PilotBuilder(warm_white=255))
+            await toggle_bulbs(even_bulbs, turn_on=True)
         else:
             print("Even switch deactivated")
-            for bulb in even_bulbs:
-                await bulb.turn_off()
+            await toggle_bulbs(even_bulbs, turn_on=False)
 
         # Handle odd switch
         if switch_odd.is_pressed:
             print("Odd switch activated")
-            for bulb in odd_bulbs:
-                await bulb.turn_on(PilotBuilder(warm_white=255))
+            await toggle_bulbs(odd_bulbs, turn_on=True)
         else:
             print("Odd switch deactivated")
-            for bulb in odd_bulbs:
-                await bulb.turn_off()
+            await toggle_bulbs(odd_bulbs, turn_on=False)
 
         # Handle button press
         if button.is_pressed:
             print("Button pressed")
-
-            # Change LED state based on the button press
-            scene = (scene + 1) % 4  # Cycle through scenes 0-3
-            leds[0].value = scene & 1  # Binary state for LED 1
-            leds[1].value = (scene >> 1) & 1  # Binary state for LED 2
-
-            # Change scene on bulbs
-            for bulb in even_bulbs + odd_bulbs:
-                await bulb.turn_on(PilotBuilder(scene=SCENES[scene]))
-
+            scene = (scene + 1) % 4
+            leds[0].value = scene & 1
+            leds[1].value = (scene >> 1) & 1
+            await toggle_bulbs(even_bulbs + odd_bulbs, turn_on=True, scene=SCENES[scene])
             await asyncio.sleep(0.1)  # Debounce delay
 
         await asyncio.sleep(0.1)  # Non-blocking polling interval for switch and button state
