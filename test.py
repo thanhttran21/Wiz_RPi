@@ -7,8 +7,8 @@ from pywizlight import wizlight, PilotBuilder, discovery
 led0 = LED(2)                           # LED 0 pin
 led1 = LED(3)                           # LED 1 pin
 button = Button(0)                      # Button pin
-switch_even = DigitalInputDevice(4)     # Switch even pin
-switch_odd = DigitalInputDevice(5)      # Switch odd pin
+switch_even = Button(18)                # Switch even pin
+switch_odd = Button(17)                 # Switch odd pin
 
 # List of bit encoded indicator LEDs
 leds = [led0, led1]
@@ -41,25 +41,26 @@ SCENES = {
 
 async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
     while True:
-        if switch_even.when_activated:  # Replace with actual logic
+        print("Polling...")
+        if switch_even.is_pressed:
             print("Even switch activated")
             for bulb in even_bulbs:
                 await bulb.turn_on(PilotBuilder(warm_white=255))
-        if switch_even.when_deactivated:
+        else:
             print("Even switch deactivated")
             for bulb in even_bulbs:
                 await bulb.turn_off()
 
-        if switch_odd.when_activated:  # Replace with actual logic
+        if switch_odd.is_pressed:
             print("Odd switch activated")
             for bulb in odd_bulbs:
                 await bulb.turn_on(PilotBuilder(warm_white=255))
-        if switch_even.when_deactivated:
+        else:
             print("Odd switch deactivated")
             for bulb in odd_bulbs:
                 await bulb.turn_off()
 
-        await asyncio.sleep(0.1)  # Adjust polling interval as needed
+        await asyncio.sleep(0.5)  # Adjust polling interval as needed
 
 
 async def handle_button_presses(button, leds, bulbs):
