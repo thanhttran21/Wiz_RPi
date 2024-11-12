@@ -61,11 +61,11 @@ async def turn_off_odd_bulbs():
         await bulb.turn_off()
 
 # Attach async functions to switch events
-def setup_switch_callbacks():
-    switch_even.when_pressed = lambda: asyncio.create_task(turn_on_even_bulbs())
-    switch_even.when_released = lambda: asyncio.create_task(turn_off_even_bulbs())
-    switch_odd.when_pressed = lambda: asyncio.create_task(turn_on_odd_bulbs())
-    switch_odd.when_released = lambda: asyncio.create_task(turn_off_odd_bulbs())
+def setup_switch_callbacks(loop):
+    switch_even.when_pressed = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_on_even_bulbs()))
+    switch_even.when_released = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_off_even_bulbs()))
+    switch_odd.when_pressed = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_on_odd_bulbs()))
+    switch_odd.when_released = lambda: loop.call_soon_threadsafe(lambda: asyncio.create_task(turn_off_odd_bulbs()))
 
 async def handle_button_presses(button, leds, bulbs):
     scene = 0  # Initial scene
@@ -92,7 +92,9 @@ async def main():
         for bulb in bulbs:
             print("Discovered bulb:", bulb.__dict__)
 
-    setup_switch_callbacks()
+    # Set up GPIO callbacks
+    loop = asyncio.get_running_loop()
+    setup_switch_callbacks(loop)
 
     # Run button press handling task
     await handle_button_presses(button, leds, even_bulbs + odd_bulbs)
