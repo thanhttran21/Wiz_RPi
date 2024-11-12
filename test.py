@@ -39,33 +39,29 @@ SCENES = {
     3: 4    # Party
 }
 
-# Event handler functions for switch events
-async def turn_on_even_bulbs():
-    print("Even switch activated")
-    for bulb in even_bulbs:
-        await bulb.turn_on(PilotBuilder(warm_white=255))
+async def monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs):
+    while True:
+        # Handle even switch
+        if switch_even.is_pressed:
+            print("Even switch activated")
+            for bulb in even_bulbs:
+                await bulb.turn_on(PilotBuilder(warm_white=255))
+        else:
+            print("Even switch deactivated")
+            for bulb in even_bulbs:
+                await bulb.turn_off()
 
-async def turn_off_even_bulbs():
-    print("Even switch deactivated")
-    for bulb in even_bulbs:
-        await bulb.turn_off()
+        # Handle odd switch
+        if switch_odd.is_pressed:
+            print("Odd switch activated")
+            for bulb in odd_bulbs:
+                await bulb.turn_on(PilotBuilder(warm_white=255))
+        else:
+            print("Odd switch deactivated")
+            for bulb in odd_bulbs:
+                await bulb.turn_off()
 
-async def turn_on_odd_bulbs():
-    print("Odd switch activated")
-    for bulb in odd_bulbs:
-        await bulb.turn_on(PilotBuilder(warm_white=255))
-
-async def turn_off_odd_bulbs():
-    print("Odd switch deactivated")
-    for bulb in odd_bulbs:
-        await bulb.turn_off()
-
-# Attach async functions to switch events
-def setup_switch_callbacks(loop):
-    switch_even.when_pressed = lambda: asyncio.run_coroutine_threadsafe(turn_on_even_bulbs(), loop)
-    switch_even.when_released = lambda: asyncio.run_coroutine_threadsafe(turn_off_even_bulbs(), loop)
-    switch_odd.when_pressed = lambda: asyncio.run_coroutine_threadsafe(turn_on_odd_bulbs(), loop)
-    switch_odd.when_released = lambda: asyncio.run_coroutine_threadsafe(turn_off_odd_bulbs(), loop)
+        await asyncio.sleep(0.1)  # Non-blocking polling interval for switches
 
 
 async def handle_button_presses(button, leds, bulbs):
@@ -96,12 +92,11 @@ async def main():
         for bulb in bulbs:
             print("Discovered bulb:", bulb.__dict__)
 
-    # Set up GPIO callbacks
-    loop = asyncio.get_running_loop()
-    setup_switch_callbacks(loop)
-
-    # Run button press handling task
-    await handle_button_presses(button, leds, even_bulbs + odd_bulbs)
+    # Run switch monitoring and LED toggling tasks concurrently
+    await asyncio.gather(
+        monitor_switches(switch_even, switch_odd, even_bulbs, odd_bulbs),
+        handle_button_presses(button, leds, even_bulbs + odd_bulbs)
+    )
 
 # Run the asyncio event loop
 asyncio.run(main())
